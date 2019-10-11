@@ -1,0 +1,29 @@
+---
+title: "School Revenue Data Science Project"
+author: "Brenndan Olson"
+output: html_document
+---
+
+Public school's rely heavily on their budgets to give students access to the best learning experience possible. This is a dataset from the United States Census Bureau on financial data of public school districts in 2017. The data should be fairly accurate, because school budgets are publically available, and the link comes from a government website.
+
+Loading in the data file and naming it finance_data:
+```{r}
+finance_data <- read.csv("~/Downloads/elsec17.csv")
+head(finance_data)
+```
+Let's see how many rows and columns are in this dataset:
+```{r}
+nrow(finance_data)
+ncol(finance_data)
+```
+141 columns is quite a lot, and upon investigating the documentation, I saw that this one dataset contains all of the different financial aspects including total revenue, total spending, and expenditure on staff and administration. For now I am just going to focus on the total revenue from state taxes.
+
+Now it is time to start making the data more readable, starting with changing the column names to something more recognizable and easier to infer what that column represents:
+```{r}
+
+```
+
+
+
+
+Some things that are not in this dataset that could affect the total revenue are the size of a school disctrict and tax distribution for education in each state.
