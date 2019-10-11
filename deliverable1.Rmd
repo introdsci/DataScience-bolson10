@@ -6,24 +6,121 @@ output: html_document
 
 Public school's rely heavily on their budgets to give students access to the best learning experience possible. This is a dataset from the United States Census Bureau on financial data of public school districts in 2017. The data should be fairly accurate, because school budgets are publically available, and the link comes from a government website.
 
-Loading in the data file and naming it finance_data:
+Loading in the necessary libraries and data file, then naming it finance_data:
 ```{r}
+suppressMessages(library(tidyverse))
+suppressMessages(library(tidyr))
 finance_data <- read.csv("~/Downloads/elsec17.csv")
 head(finance_data)
 ```
-Let's see how many rows and columns are in this dataset:
+The dataset is too big to be outputted neatly, so let's see how many rows and columns are in this dataset:
 ```{r}
 nrow(finance_data)
 ncol(finance_data)
 ```
-141 columns is quite a lot, and upon investigating the documentation, I saw that this one dataset contains all of the different financial aspects including total revenue, total spending, and expenditure on staff and administration. For now I am just going to focus on the total revenue from state taxes.
+141 columns is quite a lot, and upon investigating the documentation, I saw that this one dataset contains all of the different financial aspects including total revenue, total spending, and expenditure on staff and administration. Each one of these probably should have been in a separate dataset, so for now I am just going to focus on the total revenue from state taxes.
+
+Here are all of the current column's names related to state revenue:
+```{r}
+colnames(finance_data)[c(1:10,25:40)]
+```
+STATE: State id number
+IDCENSUS: School district id number
+NAME: School district name 
+CONUM: ANSI state and county code, used for geographic information
+CSA: Consolidated statistical area,
+CBSA: Core-based statistical area,
+SCHLEV: School level code,
+NCESID: NCESID code,
+YRDATA: year of data gathered
+V33: Fall membership, meaning total number of students attending at start of fall semester/trimester
+TSTREV: Total state revenue for each district, a combination of the next 15 rows
+C01: General formula assistance,
+C04: Staff improvement programs
+C05: Special education programs
+C06: Compensatory and basic skills attainment programs
+C07: Billingual education programs
+C08: Gifted and talented programs
+C09: Vocational education programs
+C10: School lunch programs
+C11: Capital outlay and debt service programs
+C12: Transportation programs
+C13: Other state revenue sources 
+C24: NCES local revenue
+C35: State revenue - nonspecified
+C38: State payments - benefits
+C39: State payments - nonbenefits
 
 Now it is time to start making the data more readable, starting with changing the column names to something more recognizable and easier to infer what that column represents:
 ```{r}
-
+colnames(finance_data)[colnames(finance_data) == "STATE"] <- "state"
+colnames(finance_data)[colnames(finance_data) == "IDCENSUS"] <- "id_number"
+colnames(finance_data)[colnames(finance_data) == "NAME"] <- "school_district"
+colnames(finance_data)[colnames(finance_data) == "CONUM"] <- "ansi_code"
+colnames(finance_data)[colnames(finance_data) == "CSA"] <- "consolidated_statistical_area"
+colnames(finance_data)[colnames(finance_data) == "CBSA"] <- "core_based_statistical_area"
+colnames(finance_data)[colnames(finance_data) == "SCHLEV"] <- "school_level"
+colnames(finance_data)[colnames(finance_data) == "NCESID"] <- "nces_id"
+colnames(finance_data)[colnames(finance_data) == "YRDATA"] <- "year"
+colnames(finance_data)[colnames(finance_data) == "V33"] <- "fall_attendance"
+colnames(finance_data)[colnames(finance_data) == "TSTREV"] <- "total_state_revenue"
+colnames(finance_data)[colnames(finance_data) == "C01"] <- "general_formula_assistance"
+colnames(finance_data)[colnames(finance_data) == "C04"] <- "staff_improvement_programs"
+colnames(finance_data)[colnames(finance_data) == "C05"] <- "special_education_programs"
+colnames(finance_data)[colnames(finance_data) == "C06"] <- "compensatory_and_basic_skills"
+colnames(finance_data)[colnames(finance_data) == "C07"] <- "billingual_education"
+colnames(finance_data)[colnames(finance_data) == "C08"] <- "gifted_and_talented"
+colnames(finance_data)[colnames(finance_data) == "C09"] <- "vocational_education"
+colnames(finance_data)[colnames(finance_data) == "C10"] <- "school_lunch"
+colnames(finance_data)[colnames(finance_data) == "C11"] <- "capital_outlay_and_debt_service"
+colnames(finance_data)[colnames(finance_data) == "C12"] <- "transportation"
+colnames(finance_data)[colnames(finance_data) == "C13"] <- "other_state_revebye"
+colnames(finance_data)[colnames(finance_data) == "C24"] <- "nces_local_revenue"
+colnames(finance_data)[colnames(finance_data) == "C35"] <- "nonspecified_state_revenue"
+colnames(finance_data)[colnames(finance_data) == "C38"] <- "state_payments_benefits"
+colnames(finance_data)[colnames(finance_data) == "C39"] <- "state_payments_nonbenefits"
+colnames(finance_data)[c(1:10,25:40)]
 ```
 
-
-
+Since some of this information is about the school districts and the rest is on state revenue, It makes sense to split these into two different tables, school_districts and state_revenue:
+```{r}
+school_districts <- dplyr::tibble(
+ state = finance_data$state,                          
+ id_number = finance_data$id_number,                        
+ school_district = finance_data$school_district,                 
+ ANSI_code = finance_data$ansi_code,                       
+ consolidated_statistical_area = finance_data$consolidated_statistical_area,    
+ core_based_statistical_area = finance_data$core_based_statistical_area,      
+ school_level = finance_data$school_level,                     
+ nces_id = finance_data$nces_id,                         
+ year = finance_data$year,                             
+ fall_attendance = finance_data$fall_attendance 
+ )
+state_revenue <- dplyr::tibble(
+ school_district = finance_data$school_district,
+ general_formula_assistance = finance_data$general_formula_assistance,      
+ staff_improvement_programs = finance_data$staff_improvement_programs,       
+ special_education_programs = finance_data$special_education_programs,       
+ compensatory_and_basic_skills = finance_data$compensatory_and_basic_skills,    
+ billingual_education = finance_data$billingual_education,            
+ gifted_and_talented = finance_data$gifted_and_talented,              
+ vocational_education = finance_data$vocational_education,             
+ school_lunch = finance_data$school_lunch,                     
+ capital_outlay_and_debt_service = finance_data$capital_outlay_and_debt_service,  
+ transportation = finance_data$transportation,                   
+ other_state_revebye = finance_data$other_state_revebye,              
+ nces_local_revenue = finance_data$nces_local_revenue,               
+ nonspecified_state_revenue = finance_data$nonspecified_state_revenue,      
+ state_payments_benefits = finance_data$state_payments_benefits,          
+ state_payments_nonbenefits = finance_data$state_payments_nonbenefits,  
+ total_state_revenue = finance_data$total_state_revenue 
+)
+```
+Now let's see what the two new tables look like:
+```{r}
+head(school_districts)
+head(state_revenue)
+```
+We are getting closer to having clean data, but there are still a few things that need to be done.
 
 Some things that are not in this dataset that could affect the total revenue are the size of a school disctrict and tax distribution for education in each state.
