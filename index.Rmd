@@ -8,7 +8,7 @@ output:
 
 ## Abstract
 
-
+This portfolio will document the investigation of public school distric financial data. Currently all that has been done is data discovery and preparation, with the other phases coming soon.
 
 ### 1. Discovery and Data Preparation
 
