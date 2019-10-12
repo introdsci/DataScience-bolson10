@@ -4,57 +4,59 @@ author: "Brenndan Olson"
 output: html_document
 ---
 
-Public school's rely heavily on their budgets to give students access to the best learning experience possible. This is a dataset from the United States Census Bureau on financial data of public school districts in 2017. The data should be fairly accurate, because school budgets are publically available, and the link comes from a government website.
 
-Importing Data
+Public school's rely heavily on their budgets to give students access to the best learning experience possible. This is a dataset from the United States Census Bureau on financial data of public school districts in 2017. Upon investigating the documentation, I saw that this one dataset contains all of the different financial aspects including total revenue, total spending, and expenditure on staff and administration. The data should be fairly accurate with little to no bias, because school budgets are publically available, and the data was collected by the government.
+
+##Importing Data
 Loading in the necessary libraries and data file, then naming it finance_data:
 ```{r}
-suppressMessages(library(tidyverse))
-suppressMessages(library(tidyr))
-suppressMessages(library(naniar))
+suppressWarnings(suppressMessages(library(tidyverse)))
+suppressWarnings(suppressMessages(library(tidyr)))
+suppressWarnings(suppressMessages(library(naniar)))
+suppressWarnings(suppressMessages(library(ggplot2)))
 finance_data <- read.csv("~/Downloads/elsec17.csv")
-#head(finance_data)
+head(finance_data)
 ```
-Ignore the smoke coming out from under the hood.
-
 The dataset is too big to be outputted neatly, so let's see how many rows and columns are in this dataset:
 ```{r}
 nrow(finance_data)
 ncol(finance_data)
 ```
-141 columns is quite a lot, and upon investigating the documentation, I saw that this one dataset contains all of the different financial aspects including total revenue, total spending, and expenditure on staff and administration. Each one of these probably should have been in a separate dataset, so for now I am just going to focus on the total revenue from state taxes.
+141 columns is quite a lo, so for now I am just going to focus on the total revenue from state taxes.
 
-Cleaning and tidying data
+##Cleaning and tidying data
 Here are all of the current column's names related to state revenue:
 ```{r}
 colnames(finance_data)[c(1:10,25:40)]
 ```
-STATE: State id number\n
-IDCENSUS: School district id number\n
-NAME: School district name\n 
-CONUM: ANSI state and county code, used for geographic information\n
-CSA: Consolidated statistical area,\n
-CBSA: Core-based statistical area,\n
-SCHLEV: School level code,\n
-NCESID: NCESID code,\n
-YRDATA: year of data gathered\n
-V33: Fall membership, meaning total number of students attending at start of fall semester/trimester\n
-TSTREV: Total state revenue for each district, a combination of the next 15 rows\n
-C01: General formula assistance,\n
-C04: Staff improvement programs\n
-C05: Special education programs\n
-C06: Compensatory and basic skills attainment programs\n
-C07: Billingual education programs\n
-C08: Gifted and talented programs\n
-C09: Vocational education programs\n
-C10: School lunch programs\n
-C11: Capital outlay and debt service programs\n
-C12: Transportation programs\n
-C13: Other state revenue sources \n
-C24: NCES local revenue\n
-C35: State revenue - nonspecified\n
-C38: State payments - benefits\n
-C39: State payments - nonbenefits\n
+STATE: State id number<br/>
+IDCENSUS: School district id number<br/>
+NAME: School district name<br/>
+CONUM: ANSI state and county code, used for geographic information<br/>
+CSA: Consolidated statistical area,<br/>
+CBSA: Core-based statistical area,<br/>
+SCHLEV: School level code,<br/>
+NCESID: NCESID code,<br/>
+YRDATA: year of data gathered<br/>
+V33: Fall membership, meaning total number of students attending at start of fall semester/trimester<br/>
+TSTREV: Total state revenue for each district, a combination of the next 15 rows<br/>
+C01: General formula assistance,<br/>
+C04: Staff improvement programs<br/>
+C05: Special education programs<br/>
+C06: Compensatory and basic skills attainment programs<br/>
+C07: Billingual education programs<br/>
+C08: Gifted and talented programs<br/>
+C09: Vocational education programs<br/>
+C10: School lunch programs<br/>
+C11: Capital outlay and debt service programs<br/>
+C12: Transportation programs<br/>
+C13: Other state revenue sources<br/>
+C24: NCES local revenue<br/>
+C35: State revenue - nonspecified<br/>
+C38: State payments - benefits<br/>
+C39: State payments - nonbenefits<br/>
+
+For all the monetary values, they are represented in thousands of dollars.
 
 Now it is time to start making the data more readable, starting with changing the column names to something more recognizable and easier to infer what that column represents:
 ```{r}
@@ -101,7 +103,9 @@ school_districts <- dplyr::tibble(
  fall_attendance = finance_data$fall_attendance 
  )
 state_revenue <- dplyr::tibble(
+ state = finance_data$state,
  school_district = as.character(finance_data$school_district),
+ fall_attendance = finance_data$fall_attendance,
  general_formula_assistance = finance_data$general_formula_assistance,      
  staff_improvement_programs = finance_data$staff_improvement_programs,       
  special_education_programs = finance_data$special_education_programs,       
@@ -129,18 +133,17 @@ head(state_revenue)
 ```
 We are getting closer to having clean data, but there are still a few things that need to be done. First I am going to start with the school_districts.
 
-Cleaning school_districts
+###Cleaning school_districts
 Having the states listed as numbers is pretty good if you enjoy looking at tables everytime you look at an observation. There are 51 entries in state(District of Columbia is included), and can be assigned to their corresponding state name. Since DC is not a state, I am going to make its state value equal to zero, then subtract the state number of every state after DC to put the states in a list 1-50. Next a for loop is going to go through each number 1 through 50 and assign the state name with the numeric value. This will be helpful bceause R has a variable called state.name, which we can use to assign the state names faster than by hand. We are also going to turn this column into categorical data, since they are each in one idividual state:
 ```{r}
-school_districts$state[school_districts$state == 9] <- as_factor("District of Columbia")
+school_districts$state[school_districts$state == 9] <- ("District of Columbia")
 for(i in 1:8) {
-  school_districts$state[school_districts$state == i] <- as_factor(state.name[i])
+  school_districts$state[school_districts$state == i] <- (state.name[i])
 }
 for(i in 10:51) {
-  school_districts$state[school_districts$state == i] <- as_factor(state.name[i-1])
+  school_districts$state[school_districts$state == i] <- (state.name[i-1])
 }
-levels(school_districts$state) <- state.name
-levels(school_districts$state)
+head(school_districts$state)
 ```
 Doing the same for school_level is also a good idea, to help make it easier to read:
 ```{r}
@@ -166,20 +169,47 @@ school_districts <- school_districts %>%
   replace_with_na_all(condition = ~.x %in% NA_variables)
 head(school_districts$consolidated_statistical_area)
 ```
-Cleaning state_revenue
+###Cleaning state_revenue
 
-Since this table is mostly just numbers, all we have to do is change the undefined values to NA
+Since this table is mostly just numbers, all we have to do is change the undefined values to NA and make the state column equal to the full name of the state:
 ```{r}
 NA_variables = c("N","X")
 state_revenue <- state_revenue %>% 
   replace_with_na_all(condition = ~.x %in% NA_variables)
+
+state_revenue$state[state_revenue$state == 9] <- ("District of Columbia")
+for(i in 1:8) {
+  state_revenue$state[state_revenue$state == i] <- (state.name[i])
+}
+for(i in 10:51) {
+  state_revenue$state[state_revenue$state == i] <-(state.name[i-1])
+}
+head(state_revenue$state)
 ```
 Now that the data is in a much more suitable format, let's start to investigate the data and make some analysis of it.
 
-Analyzing and vizualizing data
+Analyzing and visualizing data
+
+For the sake of having data visualizations related to each other, I am only going to analyze school districts in Maryland.
 
 ```{r}
-
+ggplot(subset(school_districts, state == "Maryland"), aes(x=school_district,y=fall_attendance)) + geom_bar(stat = "identity") + coord_flip()
 ```
-Conclusion
-One thing that is not in this dataset that could affect the total revenue is the tax distribution for education in each state.
+<br/>The distribution of fall attendance is pretty high, with the max attendance being over 150,000, and most being somewhere around 10,000.
+
+Now let's compare the attendance of a school with its total state revenue to identify any relationships:
+```{r}
+ggplot(subset(state_revenue, state == "Maryland"), aes(x=fall_attendance,y=total_state_revenue)) + geom_point(stat = "identity") 
+```
+<br/>There does seem to be a positive relationship between attendance and state revenue. It does seem justifiable for a larger school to receive more funding, Although some of the schools receive more money than those that are larger than it, possibly because of social heirarchy.  Let's compare each district's amount of spending for school lunch, transportation, and gifted and talented programs.
+```{r}
+ggplot(subset(state_revenue, state == "Maryland"), aes(x=school_district,y=school_lunch)) + geom_bar(stat = "identity") + coord_flip()
+
+ggplot(subset(state_revenue, state == "Maryland"), aes(x=school_district,y=transportation)) + geom_bar(stat = "identity") + coord_flip()
+
+ggplot(subset(state_revenue, state == "Maryland"), aes(x=school_district,y=gifted_and_talented)) + geom_bar(stat = "identity") + coord_flip()
+```
+<br/>Each school district receives different amounts for the various revenue types. While every district had some amount for school lunch or transportation, not all of them had funding for gifted and talented programs. I'm curious of there is something about the districts with no gifted programs and their average test scores compared to schools with more funding in that program.
+
+##Conclusion
+In this report I displayed my progress while I took a data source and cleaned up the data, and did some visualization to analyze it. There a lot of things this could be used for, such as determining what states have better school funding, and how they dispere that funding. If I were to use some more data, I could tie this to something about school bullying and harrassment and try to discover a correlation between funding in school and bulling.
