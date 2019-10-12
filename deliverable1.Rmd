@@ -6,13 +6,17 @@ output: html_document
 
 Public school's rely heavily on their budgets to give students access to the best learning experience possible. This is a dataset from the United States Census Bureau on financial data of public school districts in 2017. The data should be fairly accurate, because school budgets are publically available, and the link comes from a government website.
 
+Importing Data
 Loading in the necessary libraries and data file, then naming it finance_data:
 ```{r}
 suppressMessages(library(tidyverse))
 suppressMessages(library(tidyr))
+suppressMessages(library(naniar))
 finance_data <- read.csv("~/Downloads/elsec17.csv")
-head(finance_data)
+#head(finance_data)
 ```
+Ignore the smoke coming out from under the hood.
+
 The dataset is too big to be outputted neatly, so let's see how many rows and columns are in this dataset:
 ```{r}
 nrow(finance_data)
@@ -20,36 +24,37 @@ ncol(finance_data)
 ```
 141 columns is quite a lot, and upon investigating the documentation, I saw that this one dataset contains all of the different financial aspects including total revenue, total spending, and expenditure on staff and administration. Each one of these probably should have been in a separate dataset, so for now I am just going to focus on the total revenue from state taxes.
 
+Cleaning and tidying data
 Here are all of the current column's names related to state revenue:
 ```{r}
 colnames(finance_data)[c(1:10,25:40)]
 ```
-STATE: State id number
-IDCENSUS: School district id number
-NAME: School district name 
-CONUM: ANSI state and county code, used for geographic information
-CSA: Consolidated statistical area,
-CBSA: Core-based statistical area,
-SCHLEV: School level code,
-NCESID: NCESID code,
-YRDATA: year of data gathered
-V33: Fall membership, meaning total number of students attending at start of fall semester/trimester
-TSTREV: Total state revenue for each district, a combination of the next 15 rows
-C01: General formula assistance,
-C04: Staff improvement programs
-C05: Special education programs
-C06: Compensatory and basic skills attainment programs
-C07: Billingual education programs
-C08: Gifted and talented programs
-C09: Vocational education programs
-C10: School lunch programs
-C11: Capital outlay and debt service programs
-C12: Transportation programs
-C13: Other state revenue sources 
-C24: NCES local revenue
-C35: State revenue - nonspecified
-C38: State payments - benefits
-C39: State payments - nonbenefits
+STATE: State id number\n
+IDCENSUS: School district id number\n
+NAME: School district name\n 
+CONUM: ANSI state and county code, used for geographic information\n
+CSA: Consolidated statistical area,\n
+CBSA: Core-based statistical area,\n
+SCHLEV: School level code,\n
+NCESID: NCESID code,\n
+YRDATA: year of data gathered\n
+V33: Fall membership, meaning total number of students attending at start of fall semester/trimester\n
+TSTREV: Total state revenue for each district, a combination of the next 15 rows\n
+C01: General formula assistance,\n
+C04: Staff improvement programs\n
+C05: Special education programs\n
+C06: Compensatory and basic skills attainment programs\n
+C07: Billingual education programs\n
+C08: Gifted and talented programs\n
+C09: Vocational education programs\n
+C10: School lunch programs\n
+C11: Capital outlay and debt service programs\n
+C12: Transportation programs\n
+C13: Other state revenue sources \n
+C24: NCES local revenue\n
+C35: State revenue - nonspecified\n
+C38: State payments - benefits\n
+C39: State payments - nonbenefits\n
 
 Now it is time to start making the data more readable, starting with changing the column names to something more recognizable and easier to infer what that column represents:
 ```{r}
@@ -87,17 +92,16 @@ Since some of this information is about the school districts and the rest is on 
 school_districts <- dplyr::tibble(
  state = finance_data$state,                          
  id_number = finance_data$id_number,                        
- school_district = finance_data$school_district,                 
+ school_district = as.character(finance_data$school_district),                 
  ANSI_code = finance_data$ansi_code,                       
  consolidated_statistical_area = finance_data$consolidated_statistical_area,    
  core_based_statistical_area = finance_data$core_based_statistical_area,      
- school_level = finance_data$school_level,                     
+ school_level = as.character(finance_data$school_level),                     
  nces_id = finance_data$nces_id,                         
- year = finance_data$year,                             
  fall_attendance = finance_data$fall_attendance 
  )
 state_revenue <- dplyr::tibble(
- school_district = finance_data$school_district,
+ school_district = as.character(finance_data$school_district),
  general_formula_assistance = finance_data$general_formula_assistance,      
  staff_improvement_programs = finance_data$staff_improvement_programs,       
  special_education_programs = finance_data$special_education_programs,       
@@ -116,11 +120,66 @@ state_revenue <- dplyr::tibble(
  total_state_revenue = finance_data$total_state_revenue 
 )
 ```
+I decided that having a column for the same year(2017) was redundant so it will not be in the data. If I ever add more years to the data I will incorporate it back into the data.
+
 Now let's see what the two new tables look like:
 ```{r}
 head(school_districts)
 head(state_revenue)
 ```
-We are getting closer to having clean data, but there are still a few things that need to be done.
+We are getting closer to having clean data, but there are still a few things that need to be done. First I am going to start with the school_districts.
 
-Some things that are not in this dataset that could affect the total revenue are the size of a school disctrict and tax distribution for education in each state.
+Cleaning school_districts
+Having the states listed as numbers is pretty good if you enjoy looking at tables everytime you look at an observation. There are 51 entries in state(District of Columbia is included), and can be assigned to their corresponding state name. Since DC is not a state, I am going to make its state value equal to zero, then subtract the state number of every state after DC to put the states in a list 1-50. Next a for loop is going to go through each number 1 through 50 and assign the state name with the numeric value. This will be helpful bceause R has a variable called state.name, which we can use to assign the state names faster than by hand. We are also going to turn this column into categorical data, since they are each in one idividual state:
+```{r}
+school_districts$state[school_districts$state == 9] <- as_factor("District of Columbia")
+for(i in 1:8) {
+  school_districts$state[school_districts$state == i] <- as_factor(state.name[i])
+}
+for(i in 10:51) {
+  school_districts$state[school_districts$state == i] <- as_factor(state.name[i-1])
+}
+levels(school_districts$state) <- state.name
+levels(school_districts$state)
+```
+Doing the same for school_level is also a good idea, to help make it easier to read:
+```{r}
+school_districts$school_level[school_districts$school_level == "01"] <- "Elementary Only"
+school_districts$school_level[school_districts$school_level == "02"] <- "Secondary Only"
+school_districts$school_level[school_districts$school_level == "03"] <- "Elementary-Secondary"
+school_districts$school_level[school_districts$school_level == "05"] <- "Vocational/Special Education"
+school_districts$school_level[school_districts$school_level == "06"] <- "Nonoperating"
+school_districts$school_level[school_districts$school_level == "07"] <- "Educational Service Agency"
+head(school_districts$school_level)
+```
+
+Next we want the id number to be in a readable format, so we have to change the number of digits printed:
+```{r}
+options(scipen = 15)
+head(school_districts$id_number)
+```
+
+There are also some missing values in the consolidated_statistical area and other columns represented as N or X. Currently they are not seen as null values, but we can change that
+```{r}
+NA_variables = c("N","X")
+school_districts <- school_districts %>% 
+  replace_with_na_all(condition = ~.x %in% NA_variables)
+head(school_districts$consolidated_statistical_area)
+```
+Cleaning state_revenue
+
+Since this table is mostly just numbers, all we have to do is change the undefined values to NA
+```{r}
+NA_variables = c("N","X")
+state_revenue <- state_revenue %>% 
+  replace_with_na_all(condition = ~.x %in% NA_variables)
+```
+Now that the data is in a much more suitable format, let's start to investigate the data and make some analysis of it.
+
+Analyzing and vizualizing data
+
+```{r}
+
+```
+Conclusion
+One thing that is not in this dataset that could affect the total revenue is the tax distribution for education in each state.

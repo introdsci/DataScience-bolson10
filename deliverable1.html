@@ -128,105 +128,47 @@ $(document).ready(function () {
 
 
 <p>Public school’s rely heavily on their budgets to give students access to the best learning experience possible. This is a dataset from the United States Census Bureau on financial data of public school districts in 2017. The data should be fairly accurate, because school budgets are publically available, and the link comes from a government website.</p>
-<p>Loading in the necessary libraries and data file, then naming it finance_data:</p>
+<p>Importing Data Loading in the necessary libraries and data file, then naming it finance_data:</p>
 <pre class="r"><code>suppressMessages(library(tidyverse))</code></pre>
 <pre><code>## Warning: replacing previous import by 'tibble::as_tibble' when loading
 ## 'broom'</code></pre>
 <pre><code>## Warning: replacing previous import by 'tibble::tibble' when loading 'broom'</code></pre>
 <pre class="r"><code>suppressMessages(library(tidyr))
-finance_data &lt;- read.csv(&quot;~/Downloads/elsec17.csv&quot;)
-head(finance_data)</code></pre>
-<pre><code>##   STATE   IDCENSUS                           NAME CONUM CSA  CBSA SCHLEV
-## 1     1 1.5001e+12 AUTAUGA COUNTY SCHOOL DISTRICT  1001   N 33860     03
-## 2     1 1.5002e+12 BALDWIN COUNTY SCHOOL DISTRICT  1003 380 19300     03
-## 3     1 1.5003e+12 BARBOUR COUNTY SCHOOL DISTRICT  1005   N 21640     03
-## 4     1 1.5003e+12   EUFAULA CITY SCHOOL DISTRICT  1005   N 21640     03
-## 5     1 1.5004e+12    BIBB COUNTY SCHOOL DISTRICT  1007 142 13820     03
-## 6     1 1.5005e+12  BLOUNT COUNTY SCHOOL DISTRICT  1009 142 13820     03
-##    NCESID YRDATA   V33 TOTALREV TFEDREV  C14  C15 C16 C17 C19 B11  C20
-## 1 0100240     17  9307    82619    7167 1778 1936 314   0 154  30  150
-## 2 0100270     17 31268   363148   24673 6769 6287 947   0 366 173 1732
-## 3 0100300     17   847    10628    2140 1057  268 122   0  31   0   25
-## 4 0101410     17  3949    28397    3487  965  600 134   0  41  18  318
-## 5 0100360     17  3291    33469    3596  995  882 186   0  46   0  178
-## 6 0100420     17  7793    76256    7297 2453 1646 334   0 129  51   57
-##    C25 C36 B10 B12 B13 TSTREV    C01 C04 C05  C06 C07 C08 C09 C10  C11
-## 1 2665   0  83   0  57  56306  47256  65   0  496  10   0   0   0 2360
-## 2 8125   0   0   0 274 156755 133128 101   0 1903  90   0   0   0 5962
-## 3  637   0   0   0   0   5752   4124  40   0  107   5   0   0   0  191
-## 4 1322   0  24   0  65  18099  15639  61   0  161   8   0   0   0  720
-## 5 1309   0   0   0   0  22965  18375  57   0  404   4   0   0   0  901
-## 6 2572   0   0   0  55  50069  42013  49   0  688  30   0   0   0 2140
-##     C12  C13 C24 C35 C38 C39 TLOCREV T02   T06 T09 T15 T40 T99 D11    D23
-## 1  5174  945   0   0   0   0   19146   0  6880   0   0   0  22   0   6162
-## 2 12252 3319   0   0   0   0  181720   0 50931   0   0   0 188   0 102951
-## 3   831  454   0   0   0   0    2736   0  1361   0   0   0   8   0    539
-## 4   476 1034   0   0   0   0    6811   0  2921   0   0   0   7   0   2117
-## 5  2282  942   0   0   0   0    6908   0  1493   0   0   0  33   0   2394
-## 6  4547  602   0   0   0   0   18890   0  3462   0   0   0  17   6   5418
-##   A07 A08  A09 A11  A13 A15  A20  A40  U11 U22 U30  U50  U97 TOTALEXP
-## 1   1   0 1581   0 1497   0  277   19  416  84   7 1166 1034    81933
-## 2   0   0 4069   0 5750   0 2900 1716 2193 669  30 3350 6973   322157
-## 3   0   0   42   0  119   0   21    8    8   3   0    1  626    10433
-## 4  81   0  297   0  562   0  100    0  190  24  15  175  322    31155
-## 5   0   0  520   0 1080   0   86   14  313  41   3   46  885    32565
-## 6   0   0  998   1 2552   0  432    0  186 234   3  554 5027    74687
-##   TCURELSC TCURINST    E13 J13 J12 J14 V91 V92 TCURSSVC   E17   E07  E08
-## 1    75562    45659  45659   0   0   0   0   0    24701  4020  1956 1750
-## 2   283636   166157 166157   0   0   0  72   0   102546 18622 11292 3856
-## 3     9857     5055   5055   0   0   0   0   0     3950   457   360  661
-## 4    26524    15933  15933   0   0   0   3   0     8806  1391   865 1017
-## 5    30648    16664  16664   0   0   0 194   0    11625  2052  1508 1104
-## 6    68837    39156  39156   0   0   0   0   0    25210  3590  3425 1336
-##     E09   V40   V45  V90 V85 J17 J07 J08 J09 J40 J45 J90 J11 J96 TCUROTH
-## 1  4765  5921  5184 1105   0   0   0   0   0   0   0   0   0   0    5202
-## 2 18874 30243 13866 5793   0   0   0   0   0   0   0   0   0   0   14933
-## 3   627   747   874  224   0   0   0   0   0   0   0   0   0   0     852
-## 4  1926  2200   546  861   0   0   0   0   0   0   0   0   0   0    1785
-## 5  2043  2124  2007  787   0   0   0   0   0   0   0   0   0   0    2359
-## 6  4420  7507  4433  499   0   0   0   0   0   0   0   0   0   0    4471
-##     E11 V60 V65 J10 J97 NONELSEC  V70 V75  V80 J98 TCAPOUT   F12 G15 K09
-## 1  5202   0   0   0   0      778  179   0  599   0    4225   833   3  76
-## 2 14933   0   0   0   0     5196 2967  15 2214   0   25029 19058 292 387
-## 3   852   0   0   0   0       81   24   0   57   0     328    65   0   0
-## 4  1785   0   0   0   0     1251  126   0 1125   0    3190  2888   0  77
-## 5  2359   0   0   0   0      713  335   0  378   0     738    73   0   0
-## 6  4471   0   0   0   0     1112   44  48 1020   0    4277  1438  76  61
-##    K10 K11 J99 L12 M12 Q11  I86    Z32    Z33   V11  V13  V15   V17  V21
-## 1 3313   0   0   0   0 113 1255  44373  30268  2595 1141  745  3301 1456
-## 2 5292   0   0   0   0 277 8019 163560 108095 11350 7107 1620 13368 7605
-## 3  263   0   0   0   0  16  151   5246   3099   288  147  430   440  122
-## 4  225   0   0   0   0  56  134  14631   9578   847  424  577  1341  516
-## 5  665   0   0   0   0  46  420  17625  10802  1002  959  568  1458  430
-## 6 2702   0   0   0   0  75  386  37880  25006  2104 1826  927  3043 1142
-##    V23  V37  V29   Z34   V10  V12  V14 V16  V18  V22  V24 V38  V30 V32
-## 1 2571  412 1777 18654 11858  966  429 235 1272  750 1855 134 1135   0
-## 2 7321 2304 4534 64913 41421 4089 2486 474 5041 3912 3644 827 2936   0
-## 3  375   65  263  2091  1176  118   52 133  157   70  203  22  156   0
-## 4  224  508  524  5961  3819  306  164 171  498  293  154 177  362   0
-## 5 1018  312  839  7263  4225  412  318 161  559  251  695 125  484   0
-## 6 2147  274 1390 15959  9890  810  679 283 1170  564 1587  99  874   0
-##    X_19H X_21F X_31F  X_41F X_61V X_66V  W01   W31   W61
-## 1  60635  2671  2052  61254     0     0 4046   339 11717
-## 2 412199 35684  7563 440321     0     0 6803 89236 94240
-## 3   7450   704   291   7863     0     0    0   394   805
-## 4   4559  1000   115   5444     0     0    0  1803  8600
-## 5  19569   419  1457  18531     0     0 1241   586  4560
-## 6   9120  2182  1043  10258     0     0 1310  1220 25630</code></pre>
+suppressMessages(library(naniar))</code></pre>
+<pre><code>## Warning: replacing previous import by 'rlang::quo_name' when loading
+## 'naniar'</code></pre>
+<pre><code>## Warning: replacing previous import by 'rlang::enquos' when loading 'naniar'</code></pre>
+<pre><code>## Warning: replacing previous import by 'rlang::enexpr' when loading 'naniar'</code></pre>
+<pre><code>## Warning: replacing previous import by 'rlang::.data' when loading 'naniar'</code></pre>
+<pre><code>## Warning: replacing previous import by 'rlang::quo' when loading 'naniar'</code></pre>
+<pre><code>## Warning: replacing previous import by 'rlang::enexprs' when loading
+## 'naniar'</code></pre>
+<pre><code>## Warning: replacing previous import by 'rlang::ensyms' when loading 'naniar'</code></pre>
+<pre><code>## Warning: replacing previous import by 'rlang::enquo' when loading 'naniar'</code></pre>
+<pre><code>## Warning: replacing previous import by 'rlang::quos' when loading 'naniar'</code></pre>
+<pre><code>## Warning: replacing previous import by 'rlang::expr' when loading 'naniar'</code></pre>
+<pre><code>## Warning: replacing previous import by 'rlang::sym' when loading 'naniar'</code></pre>
+<pre><code>## Warning: replacing previous import by 'rlang::ensym' when loading 'naniar'</code></pre>
+<pre><code>## Warning: replacing previous import by 'rlang::syms' when loading 'naniar'</code></pre>
+<pre><code>## Warning: replacing previous import by 'rlang::are_na' when loading 'naniar'</code></pre>
+<pre><code>## Warning: replacing previous import by 'rlang::is_na' when loading 'naniar'</code></pre>
+<pre class="r"><code>finance_data &lt;- read.csv(&quot;~/Downloads/elsec17.csv&quot;)
+#head(finance_data)</code></pre>
+<p>Ignore the smoke coming out from under the hood.</p>
 <p>The dataset is too big to be outputted neatly, so let’s see how many rows and columns are in this dataset:</p>
 <pre class="r"><code>nrow(finance_data)</code></pre>
 <pre><code>## [1] 14306</code></pre>
 <pre class="r"><code>ncol(finance_data)</code></pre>
 <pre><code>## [1] 141</code></pre>
 <p>141 columns is quite a lot, and upon investigating the documentation, I saw that this one dataset contains all of the different financial aspects including total revenue, total spending, and expenditure on staff and administration. Each one of these probably should have been in a separate dataset, so for now I am just going to focus on the total revenue from state taxes.</p>
-<p>Here are all of the current column’s names related to state revenue:</p>
+<p>Cleaning and tidying data Here are all of the current column’s names related to state revenue:</p>
 <pre class="r"><code>colnames(finance_data)[c(1:10,25:40)]</code></pre>
 <pre><code>##  [1] &quot;STATE&quot;    &quot;IDCENSUS&quot; &quot;NAME&quot;     &quot;CONUM&quot;    &quot;CSA&quot;      &quot;CBSA&quot;    
 ##  [7] &quot;SCHLEV&quot;   &quot;NCESID&quot;   &quot;YRDATA&quot;   &quot;V33&quot;      &quot;TSTREV&quot;   &quot;C01&quot;     
 ## [13] &quot;C04&quot;      &quot;C05&quot;      &quot;C06&quot;      &quot;C07&quot;      &quot;C08&quot;      &quot;C09&quot;     
 ## [19] &quot;C10&quot;      &quot;C11&quot;      &quot;C12&quot;      &quot;C13&quot;      &quot;C24&quot;      &quot;C35&quot;     
 ## [25] &quot;C38&quot;      &quot;C39&quot;</code></pre>
-<p>STATE: State id number IDCENSUS: School district id number NAME: School district name CONUM: ANSI state and county code, used for geographic information CSA: Consolidated statistical area, CBSA: Core-based statistical area, SCHLEV: School level code, NCESID: NCESID code, YRDATA: year of data gathered V33: Fall membership, meaning total number of students attending at start of fall semester/trimester TSTREV: Total state revenue for each district, a combination of the next 15 rows C01: General formula assistance, C04: Staff improvement programs C05: Special education programs C06: Compensatory and basic skills attainment programs C07: Billingual education programs C08: Gifted and talented programs C09: Vocational education programs C10: School lunch programs C11: Capital outlay and debt service programs C12: Transportation programs C13: Other state revenue sources C24: NCES local revenue C35: State revenue - nonspecified C38: State payments - benefits C39: State payments - nonbenefits</p>
+<p>STATE: State id numberIDCENSUS: School district id numberNAME: School district name CONUM: ANSI state and county code, used for geographic informationCSA: Consolidated statistical area,CBSA: Core-based statistical area,SCHLEV: School level code,NCESID: NCESID code,YRDATA: year of data gatheredV33: Fall membership, meaning total number of students attending at start of fall semester/trimesterTSTREV: Total state revenue for each district, a combination of the next 15 rowsC01: General formula assistance,C04: Staff improvement programsC05: Special education programsC06: Compensatory and basic skills attainment programsC07: Billingual education programsC08: Gifted and talented programsC09: Vocational education programsC10: School lunch programsC11: Capital outlay and debt service programsC12: Transportation programsC13: Other state revenue sources C24: NCES local revenueC35: State revenue - nonspecifiedC38: State payments - benefitsC39: State payments - nonbenefits</p>
 <p>Now it is time to start making the data more readable, starting with changing the column names to something more recognizable and easier to infer what that column represents:</p>
 <pre class="r"><code>colnames(finance_data)[colnames(finance_data) == &quot;STATE&quot;] &lt;- &quot;state&quot;
 colnames(finance_data)[colnames(finance_data) == &quot;IDCENSUS&quot;] &lt;- &quot;id_number&quot;
@@ -272,17 +214,16 @@ colnames(finance_data)[c(1:10,25:40)]</code></pre>
 <pre class="r"><code>school_districts &lt;- dplyr::tibble(
  state = finance_data$state,                          
  id_number = finance_data$id_number,                        
- school_district = finance_data$school_district,                 
+ school_district = as.character(finance_data$school_district),                 
  ANSI_code = finance_data$ansi_code,                       
  consolidated_statistical_area = finance_data$consolidated_statistical_area,    
  core_based_statistical_area = finance_data$core_based_statistical_area,      
- school_level = finance_data$school_level,                     
+ school_level = as.character(finance_data$school_level),                     
  nces_id = finance_data$nces_id,                         
- year = finance_data$year,                             
  fall_attendance = finance_data$fall_attendance 
  )
 state_revenue &lt;- dplyr::tibble(
- school_district = finance_data$school_district,
+ school_district = as.character(finance_data$school_district),
  general_formula_assistance = finance_data$general_formula_assistance,      
  staff_improvement_programs = finance_data$staff_improvement_programs,       
  special_education_programs = finance_data$special_education_programs,       
@@ -300,23 +241,24 @@ state_revenue &lt;- dplyr::tibble(
  state_payments_nonbenefits = finance_data$state_payments_nonbenefits,  
  total_state_revenue = finance_data$total_state_revenue 
 )</code></pre>
+<p>I decided that having a column for the same year(2017) was redundant so it will not be in the data. If I ever add more years to the data I will incorporate it back into the data.</p>
 <p>Now let’s see what the two new tables look like:</p>
 <pre class="r"><code>head(school_districts)</code></pre>
-<pre><code>## # A tibble: 6 x 10
+<pre><code>## # A tibble: 6 x 9
 ##   state id_number school_district ANSI_code consolidated_st…
-##   &lt;int&gt;     &lt;dbl&gt; &lt;fct&gt;               &lt;int&gt; &lt;fct&gt;           
+##   &lt;int&gt;     &lt;dbl&gt; &lt;chr&gt;               &lt;int&gt; &lt;fct&gt;           
 ## 1     1   1.50e12 AUTAUGA COUNTY…      1001 N               
 ## 2     1   1.50e12 BALDWIN COUNTY…      1003 380             
 ## 3     1   1.50e12 BARBOUR COUNTY…      1005 N               
 ## 4     1   1.50e12 EUFAULA CITY S…      1005 N               
 ## 5     1   1.50e12 BIBB COUNTY SC…      1007 142             
 ## 6     1   1.50e12 BLOUNT COUNTY …      1009 142             
-## # ... with 5 more variables: core_based_statistical_area &lt;fct&gt;,
-## #   school_level &lt;fct&gt;, nces_id &lt;fct&gt;, year &lt;int&gt;, fall_attendance &lt;int&gt;</code></pre>
+## # ... with 4 more variables: core_based_statistical_area &lt;fct&gt;,
+## #   school_level &lt;chr&gt;, nces_id &lt;fct&gt;, fall_attendance &lt;int&gt;</code></pre>
 <pre class="r"><code>head(state_revenue)</code></pre>
 <pre><code>## # A tibble: 6 x 17
 ##   school_district general_formula… staff_improveme… special_educati…
-##   &lt;fct&gt;                      &lt;int&gt;            &lt;int&gt;            &lt;int&gt;
+##   &lt;chr&gt;                      &lt;int&gt;            &lt;int&gt;            &lt;int&gt;
 ## 1 AUTAUGA COUNTY…            47256               65                0
 ## 2 BALDWIN COUNTY…           133128              101                0
 ## 3 BARBOUR COUNTY…             4124               40                0
@@ -330,8 +272,59 @@ state_revenue &lt;- dplyr::tibble(
 ## #   other_state_revebye &lt;int&gt;, nces_local_revenue &lt;int&gt;,
 ## #   nonspecified_state_revenue &lt;int&gt;, state_payments_benefits &lt;int&gt;,
 ## #   state_payments_nonbenefits &lt;int&gt;, total_state_revenue &lt;int&gt;</code></pre>
-<p>We are getting closer to having clean data, but there are still a few things that need to be done.</p>
-<p>Some things that are not in this dataset that could affect the total revenue are the size of a school disctrict and tax distribution for education in each state.</p>
+<p>We are getting closer to having clean data, but there are still a few things that need to be done. First I am going to start with the school_districts.</p>
+<p>Cleaning school_districts Having the states listed as numbers is pretty good if you enjoy looking at tables everytime you look at an observation. There are 51 entries in state(District of Columbia is included), and can be assigned to their corresponding state name. Since DC is not a state, I am going to make its state value equal to zero, then subtract the state number of every state after DC to put the states in a list 1-50. Next a for loop is going to go through each number 1 through 50 and assign the state name with the numeric value. This will be helpful bceause R has a variable called state.name, which we can use to assign the state names faster than by hand. We are also going to turn this column into categorical data, since they are each in one idividual state:</p>
+<pre class="r"><code>school_districts$state[school_districts$state == 9] &lt;- as_factor(&quot;District of Columbia&quot;)
+for(i in 1:8) {
+  school_districts$state[school_districts$state == i] &lt;- as_factor(state.name[i])
+}
+for(i in 10:51) {
+  school_districts$state[school_districts$state == i] &lt;- as_factor(state.name[i-1])
+}
+levels(school_districts$state) &lt;- state.name
+levels(school_districts$state)</code></pre>
+<pre><code>##  [1] &quot;Alabama&quot;        &quot;Alaska&quot;         &quot;Arizona&quot;        &quot;Arkansas&quot;      
+##  [5] &quot;California&quot;     &quot;Colorado&quot;       &quot;Connecticut&quot;    &quot;Delaware&quot;      
+##  [9] &quot;Florida&quot;        &quot;Georgia&quot;        &quot;Hawaii&quot;         &quot;Idaho&quot;         
+## [13] &quot;Illinois&quot;       &quot;Indiana&quot;        &quot;Iowa&quot;           &quot;Kansas&quot;        
+## [17] &quot;Kentucky&quot;       &quot;Louisiana&quot;      &quot;Maine&quot;          &quot;Maryland&quot;      
+## [21] &quot;Massachusetts&quot;  &quot;Michigan&quot;       &quot;Minnesota&quot;      &quot;Mississippi&quot;   
+## [25] &quot;Missouri&quot;       &quot;Montana&quot;        &quot;Nebraska&quot;       &quot;Nevada&quot;        
+## [29] &quot;New Hampshire&quot;  &quot;New Jersey&quot;     &quot;New Mexico&quot;     &quot;New York&quot;      
+## [33] &quot;North Carolina&quot; &quot;North Dakota&quot;   &quot;Ohio&quot;           &quot;Oklahoma&quot;      
+## [37] &quot;Oregon&quot;         &quot;Pennsylvania&quot;   &quot;Rhode Island&quot;   &quot;South Carolina&quot;
+## [41] &quot;South Dakota&quot;   &quot;Tennessee&quot;      &quot;Texas&quot;          &quot;Utah&quot;          
+## [45] &quot;Vermont&quot;        &quot;Virginia&quot;       &quot;Washington&quot;     &quot;West Virginia&quot; 
+## [49] &quot;Wisconsin&quot;      &quot;Wyoming&quot;</code></pre>
+<p>Doing the same for school_level is also a good idea, to help make it easier to read:</p>
+<pre class="r"><code>school_districts$school_level[school_districts$school_level == &quot;01&quot;] &lt;- &quot;Elementary Only&quot;
+school_districts$school_level[school_districts$school_level == &quot;02&quot;] &lt;- &quot;Secondary Only&quot;
+school_districts$school_level[school_districts$school_level == &quot;03&quot;] &lt;- &quot;Elementary-Secondary&quot;
+school_districts$school_level[school_districts$school_level == &quot;05&quot;] &lt;- &quot;Vocational/Special Education&quot;
+school_districts$school_level[school_districts$school_level == &quot;06&quot;] &lt;- &quot;Nonoperating&quot;
+school_districts$school_level[school_districts$school_level == &quot;07&quot;] &lt;- &quot;Educational Service Agency&quot;
+head(school_districts$school_level)</code></pre>
+<pre><code>## [1] &quot;Elementary-Secondary&quot; &quot;Elementary-Secondary&quot; &quot;Elementary-Secondary&quot;
+## [4] &quot;Elementary-Secondary&quot; &quot;Elementary-Secondary&quot; &quot;Elementary-Secondary&quot;</code></pre>
+<p>Next we want the id number to be in a readable format, so we have to change the number of digits printed:</p>
+<pre class="r"><code>options(scipen = 15)
+head(school_districts$id_number)</code></pre>
+<pre><code>## [1] 1500100100000 1500200100000 1500300100000 1500300200000 1500400100000
+## [6] 1500500100000</code></pre>
+<p>There are also some missing values in the consolidated_statistical area and other columns represented as N or X. Currently they are not seen as null values, but we can change that</p>
+<pre class="r"><code>NA_variables = c(&quot;N&quot;,&quot;X&quot;)
+school_districts &lt;- school_districts %&gt;% 
+  replace_with_na_all(condition = ~.x %in% NA_variables)
+head(school_districts$consolidated_statistical_area)</code></pre>
+<pre><code>## [1]  NA 108  NA  NA   9   9</code></pre>
+<p>Cleaning state_revenue</p>
+<p>Since this table is mostly just numbers, all we have to do is change the undefined values to NA</p>
+<pre class="r"><code>NA_variables = c(&quot;N&quot;,&quot;X&quot;)
+state_revenue &lt;- state_revenue %&gt;% 
+  replace_with_na_all(condition = ~.x %in% NA_variables)</code></pre>
+<p>Now that the data is in a much more suitable format, let’s start to investigate the data and make some analysis of it.</p>
+<p>Analyzing and vizualizing data</p>
+<p>Conclusion One thing that is not in this dataset that could affect the total revenue is the tax distribution for education in each state.</p>
 
 
 
