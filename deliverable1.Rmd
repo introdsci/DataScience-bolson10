@@ -14,7 +14,7 @@ suppressWarnings(suppressMessages(library(tidyverse)))
 suppressWarnings(suppressMessages(library(tidyr)))
 suppressWarnings(suppressMessages(library(naniar)))
 suppressWarnings(suppressMessages(library(ggplot2)))
-finance_data <- read.csv("~/Downloads/elsec17.csv")
+finance_data <- read.csv("elsec17.csv")
 head(finance_data)
 ```
 The dataset is too big to be outputted neatly, so let's see how many rows and columns are in this dataset:
