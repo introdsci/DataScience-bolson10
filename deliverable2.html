@@ -127,7 +127,28 @@ $(document).ready(function () {
 </div>
 
 
-
+<pre class="r"><code>library(rvest)</code></pre>
+<pre><code>## Loading required package: xml2</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## -- Attaching packages ----------------------------------------------------------------------------------------------- tidyverse 1.2.1 --</code></pre>
+<pre><code>## v ggplot2 3.0.0     v purrr   0.2.5
+## v tibble  1.4.2     v dplyr   0.7.6
+## v tidyr   0.8.1     v stringr 1.3.1
+## v readr   1.1.1     v forcats 0.3.0</code></pre>
+<pre><code>## -- Conflicts -------------------------------------------------------------------------------------------------- tidyverse_conflicts() --
+## x dplyr::filter()         masks stats::filter()
+## x readr::guess_encoding() masks rvest::guess_encoding()
+## x dplyr::lag()            masks stats::lag()
+## x purrr::pluck()          masks rvest::pluck()</code></pre>
+<pre class="r"><code>library(dplyr)</code></pre>
+<pre class="r"><code>html_link &lt;- &quot;https://www.schooldigger.com/go/AL/districtrank.aspx?y=2018&quot; 
+html &lt;- read_html(html_link)</code></pre>
+<pre class="r"><code>tabl &lt;- html %&gt;% html_nodes(&quot;table&quot;)
+t &lt;- html_table(tabl)
+district_rankings_2017 &lt;- dplyr::tibble(
+  school_district = t[[1]]$District,
+  rank = t[[1]]$`Rank (of 129)`
+)</code></pre>
 
 
 

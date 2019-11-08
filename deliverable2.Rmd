@@ -5,5 +5,21 @@ output: html_document
 ---
 
 ```{r}
+library(rvest)
+library(tidyverse)
+library(dplyr)
+```
 
+```{r}
+html_link <- "https://www.schooldigger.com/go/AL/districtrank.aspx?y=2018" 
+html <- read_html(html_link)
+```
+
+```{r}
+tabl <- html %>% html_nodes("table")
+t <- html_table(tabl)
+district_rankings_2017 <- dplyr::tibble(
+  school_district = t[[1]]$District,
+  rank = t[[1]]$`Rank (of 129)`
+)
 ```
