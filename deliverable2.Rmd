@@ -4,10 +4,21 @@ author: "Brenndan Olson"
 output: html_document
 ---
 
+To do:
+Add commentary
+clean data and import deliverable1
+add markdown formatting
+do model and visualization
+make sure its litty
+
 ```{r}
 library(rvest)
 library(tidyverse)
 library(dplyr)
+#library(caret)
+library(knitr)
+#purl("deliverable1.Rmd", output = "part1.r")
+#source("part1.r")
 ```
 
 ```{r}
@@ -18,8 +29,28 @@ html <- read_html(html_link)
 ```{r}
 tabl <- html %>% html_nodes("table")
 t <- html_table(tabl)
+#t[[1]]$`Rank (2017)` %>%
+  
 district_rankings_2017 <- dplyr::tibble(
   school_district = t[[1]]$District,
-  rank = t[[1]]$`Rank (of 129)`
+  rank = t[[1]]$`Rank (2017)`
 )
+```
+
+```{r}
+district_rankings_2017$school_district <- 
+  lapply(district_rankings_2017$school_district, function(x) paste(x,'School District')) %>%
+  sapply(toupper)
+head(district_rankings_2017$school_district)
+```
+
+```{r}
+districts_with_rankings_2017 <- left_join(school_districts,district_rankings_2017, by = "school_district")
+```
+
+Modeling
+
+```{r}
+
+
 ```
