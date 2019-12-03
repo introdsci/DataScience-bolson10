@@ -3,6 +3,8 @@ title: "Modeling To Predict School District's Ranking"
 author: "Brenndan Olson"
 output: html_document
 ---
+
+###Intro  
 In the first phase I looked into state funding for public school districts. I am going to use that data to build a predictive model for a district's ranking within their state based on state revenue and other factors. I am hoping to find a correlation between the amount of money a school receives and their rank to better understand how spending money in school districts can make for a better learning environment. After the model is built, we can compare it with real values and see if it holds up. First I am going to install the necessary libraries(if necessary) then load them, and run the code from the previous phase to have the appropriate clean and tidy data. 
 ```{r}
 if( !("rvest" %in% installed.packages()) )
@@ -31,6 +33,7 @@ Currently we have two data tables, one called school_districts that contains all
 head(as_tibble(school_districts))
 head(as_tibble(state_revenue))
 ```
+###Web Scraping  
 To get an additional data source I am going to web scrape from a website called schooldigger.com that contains rankings for each school district within their respective state. I am going to use the link for the read_html() function that will make it possible for us to "scrape" out the information we want.
 ```{r}
 html_link <- "https://www.schooldigger.com/go/AL/districtrank.aspx?y=2018" 
@@ -75,7 +78,7 @@ districts_with_rankings_2017 <- districts_with_rankings_2017 %>%
   na.omit(cols = "rank")
 head(districts_with_rankings_2017)
 ```
-###Modeling   
+###Modeling and Visualization  
 To create a predictive model, we want to have our data split into two tables, the training table and the test table. The training table contains 75% of the data, and is used for making the model. The testing table has the remaining 25% of data and is used to assess the model's precision. To randomly separate the data there is a neat function called createDataPartition().
 ```{r}
 index <- createDataPartition(districts_with_rankings_2017$rank, p = 0.75, list = FALSE)
