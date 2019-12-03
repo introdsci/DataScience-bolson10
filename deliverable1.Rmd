@@ -81,7 +81,7 @@ colnames(finance_data)[colnames(finance_data) == "C09"] <- "vocational_education
 colnames(finance_data)[colnames(finance_data) == "C10"] <- "school_lunch"
 colnames(finance_data)[colnames(finance_data) == "C11"] <- "capital_outlay_and_debt_service"
 colnames(finance_data)[colnames(finance_data) == "C12"] <- "transportation"
-colnames(finance_data)[colnames(finance_data) == "C13"] <- "other_state_revebye"
+colnames(finance_data)[colnames(finance_data) == "C13"] <- "other_state_revenue"
 colnames(finance_data)[colnames(finance_data) == "C24"] <- "nces_local_revenue"
 colnames(finance_data)[colnames(finance_data) == "C35"] <- "nonspecified_state_revenue"
 colnames(finance_data)[colnames(finance_data) == "C38"] <- "state_payments_benefits"
@@ -116,7 +116,7 @@ state_revenue <- dplyr::tibble(
  school_lunch = finance_data$school_lunch,                     
  capital_outlay_and_debt_service = finance_data$capital_outlay_and_debt_service,  
  transportation = finance_data$transportation,                   
- other_state_revebye = finance_data$other_state_revebye,              
+ other_state_revenue = finance_data$other_state_revenue,              
  nces_local_revenue = finance_data$nces_local_revenue,               
  nonspecified_state_revenue = finance_data$nonspecified_state_revenue,      
  state_payments_benefits = finance_data$state_payments_benefits,          

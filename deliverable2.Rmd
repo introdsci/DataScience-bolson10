@@ -1,27 +1,37 @@
 ---
-title: "School Revenue Data Science Project"
+title: "Modeling To Predict School District's Ranking"
 author: "Brenndan Olson"
 output: html_document
 ---
-
-To do:
-Add commentary
-clean data and import deliverable1
-add markdown formatting
-do model and visualization
-add to index.html
-make sure its litty
+In the first phase I looked into state funding for public school districts. I am going to use that data to build a predictive model for a district's ranking within their state based on state revenue and other factors. I am hoping to find a correlation between the amount of money a school receives and their rank to better understand how spending money in school districts can make for a better learning environment. After the model is built, we can compare it with real values and see if it holds up. First I am going to install the necessary libraries(if necessary) then load them, and run the code from the previous phase to have the appropriate clean and tidy data. 
+```{r}
+if( !("rvest" %in% installed.packages()) )
+install.packages("rvest")
+if( !("tidyverse" %in% installed.packages()) )
+install.packages("tidyverse")
+if( !("dplyr" %in% installed.packages()) )
+install.packages("dplyr")
+if( !("caret" %in% installed.packages()) )
+install.packages("caret")
+if( !("knitr" %in% installed.packages()) )
+install.packages("knitr")
+suppressWarnings(library(rvest))
+suppressWarnings(library(tidyverse))
+suppressWarnings(library(dplyr))
+suppressWarnings(library(caret))
+suppressWarnings(library(knitr))
+```
 
 ```{r}
-library(rvest)
-library(tidyverse)
-library(dplyr)
-library(caret)
-library(knitr)
 purl("deliverable1.Rmd", output = "part1.r")
 source("part1.r")
 ```
-To get an additional data source I am going to web scrape from a website called schooldigger.com that contains rankings for each school district within their respective state. 
+Currently we have two data tables, one called school_districts that contains all of the general information on each district, and state_revenue, which holds each district's state funding for various programs/services.
+```{r}
+head(as_tibble(school_districts))
+head(as_tibble(state_revenue))
+```
+To get an additional data source I am going to web scrape from a website called schooldigger.com that contains rankings for each school district within their respective state. I am going to use the link for the read_html() function that will make it possible for us to "scrape" out the information we want.
 ```{r}
 html_link <- "https://www.schooldigger.com/go/AL/districtrank.aspx?y=2018" 
 html <- read_html(html_link)
@@ -30,6 +40,7 @@ Inside the html link we gave it, we are going to look for nodes under the name "
 ```{r}
 tabl <- html %>% html_nodes("table")
 t <- html_table(tabl)
+head(t[[1]])
 ```
 We are going to use that scraped data to make another tibble called district_rankings_2017. The only two columns we need are the school district and rank, and we are also going to omit any school districts that don't have a ranking. While there is potentially a lot to be explored with unranked districts, it is hard to compare them against each other, and they do not provide much support for the model we are going to build later.
 ```{r}  
@@ -39,6 +50,7 @@ district_rankings_2017 <- dplyr::tibble(
 
 district_rankings_2017 <- district_rankings_2017 %>%
   na.omit(cols = "rank")
+head(district_rankings_2017)
 ```
 To make sure that both datasets have the same name and format for school districts, I am going to modify the school_district column of district_rankings_2017 to append "School District" to every district name, and make every character uppercase to match how they are written in the school_districts table
 ```{r}
@@ -53,35 +65,39 @@ school_districts_alabama <- school_districts %>%
   dplyr::filter(state == "Alabama")
 state_revenue_alabama <- state_revenue %>%
   dplyr::filter(state == "Alabama")
-
+head(state_revenue_alabama)
 districts_with_rankings_2017 <- left_join(school_districts_alabama,district_rankings_2017, by = "school_district") 
 districts_with_rankings_2017 <- districts_with_rankings_2017 %>%
   dplyr::mutate(state_rev = state_revenue_alabama$total_state_revenue) %>%
   dplyr::mutate(general_formula_assistance = state_revenue_alabama$general_formula_assistance) %>%
+  dplyr::mutate(staff_improvement_programs = state_revenue_alabama$staff_improvement_programs) %>%
+  dplyr::mutate(other_state_revenue = state_revenue_alabama$other_state_revenue) %>%
   na.omit(cols = "rank")
-
+head(districts_with_rankings_2017)
 ```
-
-Modeling 
-With our new data that contains the rankings for each school, I am curious if there is a way to predict the ranking of the district, based on some of the information gathered on state revenue.
-
+###Modeling   
 To create a predictive model, we want to have our data split into two tables, the training table and the test table. The training table contains 75% of the data, and is used for making the model. The testing table has the remaining 25% of data and is used to assess the model's precision. To randomly separate the data there is a neat function called createDataPartition().
 ```{r}
 index <- createDataPartition(districts_with_rankings_2017$rank, p = 0.75, list = FALSE)
 train <- districts_with_rankings_2017[index,]
 test <- districts_with_rankings_2017[-index,]
 ```
-Now that we have everything set up, we can get into the modeling. Like I said, we are going to use the training data to create this model, and for this first one we are going to try and predict district rank based on total state revenue, fall attendance, and general formaula assistance.
+Now that we have everything set up, we can get into the modeling. Like I said, we are going to use the training data to create this model, and for this first one we are going to try and predict district rank based on total state revenue, fall attendance, and general formaula assistance. The column to the far right is the p-value, and the lower that number is the more significant that variable is at predicting your independent variable(rank). Since we want our model to be as accurate as possible, dependent variables with higher p-values will be removed, until there are a few
 ```{r}
-model <- lm(train, formula = rank~state_rev + fall_attendance + general_formula_assistance)
+model <- lm(train, formula = rank~state_rev + fall_attendance + general_formula_assistance + staff_improvement_programs + other_state_revenue)
 summary(model)
 ```
-
+other_state_revenue had the highest p-value, so I am going to run it again without that variable.
 ```{r}
-model <- lm(train, formula = rank~state_rev + general_formula_assistance)
+model <- lm(train, formula = rank~state_rev + fall_attendance + general_formula_assistance + staff_improvement_programs)
 summary(model)
 ```
-One limitation of this model is that part of the p-values are dependent on which data is in the test and train table, because if you run the createDataPartition() part and then re-run the model, you get different p-values.
+The highest value now belongs to fall_attendance, so it will also be removed.
+```{r}
+model <- lm(train, formula = rank~state_rev + general_formula_assistance + staff_improvement_programs)
+summary(model)
+```
+Because none of them reach a significantly low number, the variables will not be great at predicting the rankings of each district. One limitation of this model is that part of the p-values are dependent on which data is in the test and train table, because if you run the createDataPartition() part which is random, you get different data plugged into the model.
 
 Now I am going to use the coefficients given in the model to create a vector of what the model predicted the rankings to be.
 ```{r}
@@ -91,6 +107,7 @@ test_model <- function(model)
   for(i in 1:nrow(test))
   {
     yhat <- model$coefficients[1] + test$state_rev[i]*model$coefficients[2] + test$general_formula_assistance[i]*model$coefficients[3]
+    + test$staff_improvement_programs[i]*model$coefficients[4]
     modeled_rankings <- c(modeled_rankings,yhat)
   }
   return(modeled_rankings)
@@ -100,8 +117,11 @@ test_avg_rankings <- test$rank
 ```
 I am now going to graph the results of the model, and compare them to the actual rankings in the testing table
 ```{r}
-plot(x=1:length(test_avg_rankings),y=sort(test_avg_rankings),type="p",col="red")
-  points(x=1:length(modeled_avg_rankings),y=sort(modeled_avg_rankings))
-  title(main = "Model average_ratings(black) vs data average_ratings(red)")
+plot(x=1:length(test_avg_rankings),y=test_avg_rankings,type="p",col="red", ylab = "District rank", xlab = "")
+  legend("topright",c("Model","Real Data"),fill = c("black","red"))
+  points(x=1:length(modeled_avg_rankings),y=modeled_avg_rankings)
+  title(main = "Alabama 2017 Modeled Average Rankings vs Data Average Rankings")
+  
 ```
-As you can see the model is not very accurate. I already stated the limitation about variation on the model's results, but there are a few others. One of the other biggest factors about this model is it does not account for size of a district, because generally a larger district would receive more state funding. However since the fall_attendance column was negatively affecting the model, I decided to remove it. Another limitation is that 
+  
+  As you can see the model is not very accurate, especially with lower-ranked schools. The larger the vertical gap there is between each black and red dot on the same x-axis value, the worse the model was at predicting. I already stated the limitation about variation on the model's results, but there are a few others. One of the other biggest factors about this model is it does not account for size of a district, because generally a larger district would receive more state funding. However since the fall_attendance column was negatively affecting the model, I decided to remove it. Another limitation is that there is no other performance-based data to test against rank, such as average GPA's or students in advanced classes.

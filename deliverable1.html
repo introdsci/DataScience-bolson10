@@ -135,7 +135,7 @@ $(document).ready(function () {
 suppressWarnings(suppressMessages(library(tidyr)))
 suppressWarnings(suppressMessages(library(naniar)))
 suppressWarnings(suppressMessages(library(ggplot2)))
-finance_data &lt;- read.csv(&quot;~/Downloads/elsec17.csv&quot;)
+finance_data &lt;- read.csv(&quot;elsec17.csv&quot;)
 head(finance_data)</code></pre>
 <pre><code>##   STATE   IDCENSUS                           NAME CONUM CSA  CBSA SCHLEV
 ## 1     1 1.5001e+12 AUTAUGA COUNTY SCHOOL DISTRICT  1001   N 33860     03
@@ -254,7 +254,7 @@ colnames(finance_data)[colnames(finance_data) == &quot;C09&quot;] &lt;- &quot;vo
 colnames(finance_data)[colnames(finance_data) == &quot;C10&quot;] &lt;- &quot;school_lunch&quot;
 colnames(finance_data)[colnames(finance_data) == &quot;C11&quot;] &lt;- &quot;capital_outlay_and_debt_service&quot;
 colnames(finance_data)[colnames(finance_data) == &quot;C12&quot;] &lt;- &quot;transportation&quot;
-colnames(finance_data)[colnames(finance_data) == &quot;C13&quot;] &lt;- &quot;other_state_revebye&quot;
+colnames(finance_data)[colnames(finance_data) == &quot;C13&quot;] &lt;- &quot;other_state_revenue&quot;
 colnames(finance_data)[colnames(finance_data) == &quot;C24&quot;] &lt;- &quot;nces_local_revenue&quot;
 colnames(finance_data)[colnames(finance_data) == &quot;C35&quot;] &lt;- &quot;nonspecified_state_revenue&quot;
 colnames(finance_data)[colnames(finance_data) == &quot;C38&quot;] &lt;- &quot;state_payments_benefits&quot;
@@ -270,7 +270,7 @@ colnames(finance_data)[c(1:10,25:40)]</code></pre>
 ## [15] &quot;compensatory_and_basic_skills&quot;   &quot;billingual_education&quot;           
 ## [17] &quot;gifted_and_talented&quot;             &quot;vocational_education&quot;           
 ## [19] &quot;school_lunch&quot;                    &quot;capital_outlay_and_debt_service&quot;
-## [21] &quot;transportation&quot;                  &quot;other_state_revebye&quot;            
+## [21] &quot;transportation&quot;                  &quot;other_state_revenue&quot;            
 ## [23] &quot;nces_local_revenue&quot;              &quot;nonspecified_state_revenue&quot;     
 ## [25] &quot;state_payments_benefits&quot;         &quot;state_payments_nonbenefits&quot;</code></pre>
 <p>Since some of this information is about the school districts and the rest is on state revenue, It makes sense to split these into two different tables, school_districts and state_revenue:</p>
@@ -299,7 +299,7 @@ state_revenue &lt;- dplyr::tibble(
  school_lunch = finance_data$school_lunch,                     
  capital_outlay_and_debt_service = finance_data$capital_outlay_and_debt_service,  
  transportation = finance_data$transportation,                   
- other_state_revebye = finance_data$other_state_revebye,              
+ other_state_revenue = finance_data$other_state_revenue,              
  nces_local_revenue = finance_data$nces_local_revenue,               
  nonspecified_state_revenue = finance_data$nonspecified_state_revenue,      
  state_payments_benefits = finance_data$state_payments_benefits,          
@@ -318,7 +318,7 @@ state_revenue &lt;- dplyr::tibble(
 ## 4     1   1.50e12 EUFAULA CITY S…      1005 N               
 ## 5     1   1.50e12 BIBB COUNTY SC…      1007 142             
 ## 6     1   1.50e12 BLOUNT COUNTY …      1009 142             
-## # ... with 4 more variables: core_based_statistical_area &lt;fct&gt;,
+## # … with 4 more variables: core_based_statistical_area &lt;fct&gt;,
 ## #   school_level &lt;chr&gt;, nces_id &lt;fct&gt;, fall_attendance &lt;int&gt;</code></pre>
 <pre class="r"><code>head(state_revenue)</code></pre>
 <pre><code>## # A tibble: 6 x 19
@@ -330,11 +330,11 @@ state_revenue &lt;- dplyr::tibble(
 ## 4     1 EUFAULA CITY S…            3949            15639               61
 ## 5     1 BIBB COUNTY SC…            3291            18375               57
 ## 6     1 BLOUNT COUNTY …            7793            42013               49
-## # ... with 14 more variables: special_education_programs &lt;int&gt;,
+## # … with 14 more variables: special_education_programs &lt;int&gt;,
 ## #   compensatory_and_basic_skills &lt;int&gt;, billingual_education &lt;int&gt;,
 ## #   gifted_and_talented &lt;int&gt;, vocational_education &lt;int&gt;,
 ## #   school_lunch &lt;int&gt;, capital_outlay_and_debt_service &lt;int&gt;,
-## #   transportation &lt;int&gt;, other_state_revebye &lt;int&gt;,
+## #   transportation &lt;int&gt;, other_state_revenue &lt;int&gt;,
 ## #   nces_local_revenue &lt;int&gt;, nonspecified_state_revenue &lt;int&gt;,
 ## #   state_payments_benefits &lt;int&gt;, state_payments_nonbenefits &lt;int&gt;,
 ## #   total_state_revenue &lt;int&gt;</code></pre>

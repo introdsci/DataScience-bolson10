@@ -1,5 +1,5 @@
 ---
-title: "School Revenue Across all States" #replace the title with something short and catchy to represent your project
+title: "School District Funding and Impact " #replace the title with something short and catchy to represent your project
 subtitle: "Brenndan Olson's Data Science Portfolio" #replace blank with your name
 output:
   html_document:
@@ -8,8 +8,9 @@ output:
 
 ## Abstract
 
-This portfolio will document the investigation of public school distric financial data. Currently all that has been done is data discovery and preparation, with the other phases coming soon.
-
+This portfolio will document the investigation of public school distric financial data. Using this data, a predictive model was built and tested to assess its accuracy.
+  
+  
 ### 1. Discovery and Data Preparation
 
 In this first phase we are going to be finding a dataset, and cleaning up the data to make it more suited for statistical analysis.
@@ -17,6 +18,7 @@ In this first phase we are going to be finding a dataset, and cleaning up the da
 
 ### 2. Model Planning and Building
 
+After finding some initial data, more is supplemented to create a model to predict a district's ranking.  
 [Second Phase](https://introdsci.github.io/DataScience-bolson10/deliverable2.html)
 
 ### 3. Results and Operationalization
