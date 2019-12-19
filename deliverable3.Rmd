@@ -105,10 +105,9 @@ The model is much better than the last one I created, because the values did not
 
 I am now going to compare *total_revenue_per_student* with a few of the variables to look for any trends
 ```{r}
-library(ggplot2)
 ggplot(data = districts_with_rankings_and_model_data_2017,aes(x=rank,y=total_revenue_per_student)) + geom_point()
 ```
-Some of the highest-ranked districts do have higher than average revenue, but for middle values of rank the revenue isn't really affected by the rank, and revenue seems to increase a slight bit in the lower-ranked districts.
+<br/>Some of the highest-ranked districts do have higher than average revenue, but for middle values of rank the revenue isn't really affected by the rank, and revenue seems to increase a slight bit in the lower-ranked districts.
 
 
 
