@@ -101,7 +101,7 @@ plot(x=1:length(test_avg_rankings),y=test_avg_rankings,type="p",col="red", ylab 
   points(x=1:length(modeled_avg_rankings),y=modeled_avg_rankings)
   title(main = "Alabama 2017 Modeled Revenue per Student vs Data Revenue per Student")
 ```
-The model is much better than the last one I created, because the values did not range very far, and would miss high or low values. There is one large outlier, but most other predicted values are relatively close. 
+<br/>The model is much better than the last one I created, because the values did not range very far, and would miss high or low values. There is one large outlier, but most other predicted values are relatively close. 
 
 I am now going to compare *total_revenue_per_student* with a few of the variables to look for any trends
 ```{r}
