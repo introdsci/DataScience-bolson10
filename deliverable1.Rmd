@@ -3,15 +3,13 @@ title: "School Revenue Data Science Project"
 author: "Brenndan Olson"
 output: html_document
 ---
-
-
 Public school's rely heavily on their budgets to give students access to the best learning experience possible.For this project I am going to investigate public school district finance data and determine any factors that contribute to how good a district is.
 
 This is a dataset from the United States Census Bureau on financial data of public school districts in 2017. Upon investigating the documentation, I saw that this one dataset contains all of the different financial aspects including total revenue, total spending, and expenditure on staff and administration. The data should be fairly accurate with little to no bias, because school budgets are publically available, and the data was collected by the government.
 
 ##Importing Data
-Loading in the necessary libraries and data file, then naming it finance_data:
-```{r}
+Loading in the necessary libraries and data file, then naming it finance_data. "includes.R" is a R script I created that will install any missing libraries and load them.
+```{r warning=FALSE}
 source("includes.R")
 finance_data <- read.csv("elsec17.csv")
 head(finance_data)

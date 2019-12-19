@@ -1,5 +1,5 @@
 ---
-title: "School District Modeling"
+title: "School District Improved Modeling and Reflection"
 author: "Brenndan Olson"
 output:
   html_document:
@@ -7,9 +7,10 @@ output:
 ---
 In this final phase of my project, I am going to try and build a better model than last time, and discuss the relevancy of this data within our society.
 
-First I am going to run all of the previous code so we can have the data we currently have.
-```{r}
+First I am going to run all of the previous code so we can have the data we currently have. It is also going to print the old model which you can see has very bad predicting.
+```{r warning=FALSE, message=FALSE}
 source("includes.R")
+options(knitr.duplicate.label = 'allow')
 purl("deliverable2.Rmd", output = "part2.r")
 source("part2.r")
 ```

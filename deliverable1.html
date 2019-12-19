@@ -127,15 +127,30 @@ $(document).ready(function () {
 </div>
 
 
-<p>Public school’s rely heavily on their budgets to give students access to the best learning experience possible. This is a dataset from the United States Census Bureau on financial data of public school districts in 2017. Upon investigating the documentation, I saw that this one dataset contains all of the different financial aspects including total revenue, total spending, and expenditure on staff and administration. The data should be fairly accurate with little to no bias, because school budgets are publically available, and the data was collected by the government.</p>
+<p>Public school’s rely heavily on their budgets to give students access to the best learning experience possible.For this project I am going to investigate public school district finance data and determine any factors that contribute to how good a district is.</p>
+<p>This is a dataset from the United States Census Bureau on financial data of public school districts in 2017. Upon investigating the documentation, I saw that this one dataset contains all of the different financial aspects including total revenue, total spending, and expenditure on staff and administration. The data should be fairly accurate with little to no bias, because school budgets are publically available, and the data was collected by the government.</p>
 <div id="importing-data" class="section level2">
 <h2>Importing Data</h2>
-<p>Loading in the necessary libraries and data file, then naming it finance_data:</p>
-<pre class="r"><code>suppressWarnings(suppressMessages(library(tidyverse)))
-suppressWarnings(suppressMessages(library(tidyr)))
-suppressWarnings(suppressMessages(library(naniar)))
-suppressWarnings(suppressMessages(library(ggplot2)))
-finance_data &lt;- read.csv(&quot;elsec17.csv&quot;)
+<p>Loading in the necessary libraries and data file, then naming it finance_data. “includes.R” is a R script I created that will install any missing libraries and load them.</p>
+<pre class="r"><code>source(&quot;includes.R&quot;)</code></pre>
+<pre><code>## Loading required package: xml2</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>## ✔ ggplot2 3.0.0     ✔ purrr   0.2.5
+## ✔ tibble  2.1.3     ✔ dplyr   0.8.3
+## ✔ tidyr   1.0.0     ✔ stringr 1.3.1
+## ✔ readr   1.1.1     ✔ forcats 0.3.0</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter()         masks stats::filter()
+## ✖ readr::guess_encoding() masks rvest::guess_encoding()
+## ✖ dplyr::lag()            masks stats::lag()
+## ✖ purrr::pluck()          masks rvest::pluck()</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre><code>## 
+## Attaching package: 'caret'</code></pre>
+<pre><code>## The following object is masked from 'package:purrr':
+## 
+##     lift</code></pre>
+<pre class="r"><code>finance_data &lt;- read.csv(&quot;elsec17.csv&quot;)
 head(finance_data)</code></pre>
 <pre><code>##   STATE   IDCENSUS                           NAME CONUM CSA  CBSA SCHLEV
 ## 1     1 1.5001e+12 AUTAUGA COUNTY SCHOOL DISTRICT  1001   N 33860     03
@@ -219,7 +234,7 @@ head(finance_data)</code></pre>
 <pre><code>## [1] 14306</code></pre>
 <pre class="r"><code>ncol(finance_data)</code></pre>
 <pre><code>## [1] 141</code></pre>
-<p>141 columns is quite a lo, so for now I am just going to focus on the total revenue from state taxes.</p>
+<p>141 columns is quite a lot, so for now I am just going to focus on the total revenue from state taxes. There is other financial data including some federal and misc. variables, but most of them are vague and not super clear what they are. Working with just state data for now will keep things simple.</p>
 </div>
 <div id="cleaning-and-tidying-data" class="section level2">
 <h2>Cleaning and tidying data</h2>
@@ -230,7 +245,7 @@ head(finance_data)</code></pre>
 ## [13] &quot;C04&quot;      &quot;C05&quot;      &quot;C06&quot;      &quot;C07&quot;      &quot;C08&quot;      &quot;C09&quot;     
 ## [19] &quot;C10&quot;      &quot;C11&quot;      &quot;C12&quot;      &quot;C13&quot;      &quot;C24&quot;      &quot;C35&quot;     
 ## [25] &quot;C38&quot;      &quot;C39&quot;</code></pre>
-<p>STATE: State id number<br /> IDCENSUS: School district id number<br /> NAME: School district name<br /> CONUM: ANSI state and county code, used for geographic information<br /> CSA: Consolidated statistical area,<br /> CBSA: Core-based statistical area,<br /> SCHLEV: School level code,<br /> NCESID: NCESID code,<br /> YRDATA: year of data gathered<br /> V33: Fall membership, meaning total number of students attending at start of fall semester/trimester<br /> TSTREV: Total state revenue for each district, a combination of the next 15 rows<br /> C01: General formula assistance,<br /> C04: Staff improvement programs<br /> C05: Special education programs<br /> C06: Compensatory and basic skills attainment programs<br /> C07: Billingual education programs<br /> C08: Gifted and talented programs<br /> C09: Vocational education programs<br /> C10: School lunch programs<br /> C11: Capital outlay and debt service programs<br /> C12: Transportation programs<br /> C13: Other state revenue sources<br /> C24: NCES local revenue<br /> C35: State revenue - nonspecified<br /> C38: State payments - benefits<br /> C39: State payments - nonbenefits<br /></p>
+<p>Here is what each column represents:<br /> STATE: State id number<br /> IDCENSUS: School district id number<br /> NAME: School district name<br /> CONUM: ANSI state and county code, used for geographic information<br /> CSA: Consolidated statistical area,<br /> CBSA: Core-based statistical area,<br /> SCHLEV: School level code,<br /> NCESID: NCESID code,<br /> YRDATA: year of data gathered<br /> V33: Fall membership, meaning total number of students attending at start of fall semester/trimester<br /> TSTREV: Total state revenue for each district, a combination of the next 15 rows<br /> C01: General formula assistance,<br /> C04: Staff improvement programs<br /> C05: Special education programs<br /> C06: Compensatory and basic skills attainment programs<br /> C07: Billingual education programs<br /> C08: Gifted and talented programs<br /> C09: Vocational education programs<br /> C10: School lunch programs<br /> C11: Capital outlay and debt service programs<br /> C12: Transportation programs<br /> C13: Other state revenue sources<br /> C24: NCES local revenue<br /> C35: State revenue - nonspecified<br /> C38: State payments - benefits<br /> C39: State payments - nonbenefits<br /></p>
 <p>For all the monetary values, they are represented in thousands of dollars.</p>
 <p>Now it is time to start making the data more readable, starting with changing the column names to something more recognizable and easier to infer what that column represents:</p>
 <pre class="r"><code>colnames(finance_data)[colnames(finance_data) == &quot;STATE&quot;] &lt;- &quot;state&quot;
@@ -273,7 +288,7 @@ colnames(finance_data)[c(1:10,25:40)]</code></pre>
 ## [21] &quot;transportation&quot;                  &quot;other_state_revenue&quot;            
 ## [23] &quot;nces_local_revenue&quot;              &quot;nonspecified_state_revenue&quot;     
 ## [25] &quot;state_payments_benefits&quot;         &quot;state_payments_nonbenefits&quot;</code></pre>
-<p>Since some of this information is about the school districts and the rest is on state revenue, It makes sense to split these into two different tables, school_districts and state_revenue:</p>
+<p>Since some of this information is about the school districts and the rest is on state revenue, It makes sense to split these into two different tables, school_districts and state_revenue. School_districts will contain the general information on each school district, and state_revenue contains each school district’s state revenue and spending.</p>
 <pre class="r"><code>school_districts &lt;- dplyr::tibble(
  state = finance_data$state,                          
  id_number = finance_data$id_number,                        
@@ -306,7 +321,6 @@ state_revenue &lt;- dplyr::tibble(
  state_payments_nonbenefits = finance_data$state_payments_nonbenefits,  
  total_state_revenue = finance_data$total_state_revenue 
 )</code></pre>
-<p>I decided that having a column for the same year(2017) was redundant so it will not be in the data. If I ever add more years to the data I will incorporate it back into the data.</p>
 <p>Now let’s see what the two new tables look like:</p>
 <pre class="r"><code>head(school_districts)</code></pre>
 <pre><code>## # A tibble: 6 x 9
@@ -407,7 +421,7 @@ head(state_revenue$state)</code></pre>
 </div>
 <div id="conclusion" class="section level2">
 <h2>Conclusion</h2>
-<p>In this report I displayed my progress while I took a data source and cleaned up the data, and did some visualization to analyze it. There a lot of things this could be used for, such as determining what states have better school funding, and how they dispere that funding. If I were to use some more data, I could tie this to something about school bullying and harrassment and try to discover a correlation between funding in school and bulling.</p>
+<p>In this report I displayed my progress while I took a data source and cleaned up the data, and did some visualization to analyze it. There a lot of things this could be used for, such as determining what states have better school funding, and how they dispere that funding. If I were to get some more data, I could start to discover how the money a district receives affects its performance.</p>
 </div>
 
 

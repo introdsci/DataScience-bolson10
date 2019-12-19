@@ -8,14 +8,13 @@ output:
 
 ## Abstract
 
-This portfolio will document the investigation of public school distric financial data. Using this data, a predictive model was built and tested to assess its accuracy.
+This portfolio will document the investigation of public school district financial data, and its affect on performance. It is pretty obvious that more spending in schools will yield more successful students, and data is collected and analyzed to try and support that claim. After the data is collected, multiple linear regression modeling is done to find correlation in the data.
   
   
 ### 1. Discovery and Data Preparation
 
-In this first phase we are going to be finding a dataset, and cleaning up the data to make it more suited for statistical analysis.
+In this first phase we are going to be finding a dataset, and cleaning up the data to make it more suited for statistical analysis. Early investigations will also be done on the data collected.
 [First Phase](https://introdsci.github.io/DataScience-bolson10/deliverable1.html)
-
 ### 2. Model Planning and Building
 
 After finding some initial data, more is supplemented to create a model to predict a district's ranking.  
@@ -23,5 +22,6 @@ After finding some initial data, more is supplemented to create a model to predi
 
 ### 3. Results and Operationalization
 
-Coming soon...
+More data is collected, and a better model is built. The implications of this data are also discussed.
+[Third Phase](https://introdsci.github.io/DataScience-bolson10/deliverable3.html)
 
