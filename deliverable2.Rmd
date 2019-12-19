@@ -7,21 +7,7 @@ output: html_document
 ###Intro  
 In the first phase I looked into state funding for public school districts. I am going to use that data to build a predictive model for a district's ranking within their state based on state revenue and other factors. I am hoping to find a correlation between the amount of money a school receives and their rank to better understand how spending money in school districts can make for a better learning environment. After the model is built, we can compare it with real values and see if it holds up. First I am going to install the necessary libraries(if necessary) then load them, and run the code from the previous phase to have the appropriate clean and tidy data. 
 ```{r}
-if( !("rvest" %in% installed.packages()) )
-install.packages("rvest")
-if( !("tidyverse" %in% installed.packages()) )
-install.packages("tidyverse")
-if( !("dplyr" %in% installed.packages()) )
-install.packages("dplyr")
-if( !("caret" %in% installed.packages()) )
-install.packages("caret")
-if( !("knitr" %in% installed.packages()) )
-install.packages("knitr")
-suppressWarnings(library(rvest))
-suppressWarnings(library(tidyverse))
-suppressWarnings(library(dplyr))
-suppressWarnings(library(caret))
-suppressWarnings(library(knitr))
+source("includes.R")
 ```
 
 ```{r}

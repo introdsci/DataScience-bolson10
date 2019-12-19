@@ -1,39 +1,121 @@
 ---
-title: "R Notebook"
+title: "School District Modeling"
 author: "Brenndan Olson"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
+In this final phase of my project, I am going to try and build a better model than last time, and discuss the relevancy of this data within our society.
 
+First I am going to run all of the previous code so we can have the data we currently have.
 ```{r}
-suppressWarnings(library(knitr))
-```
-
-```{r}
+source("includes.R")
 purl("deliverable2.Rmd", output = "part2.r")
 source("part2.r")
 ```
+Next I am going to add another dataset to help with building a model. The original data I had on revenue for school districts was only state funding, and pretty limited overall. This time around I was able to find some better and more appropriate data, from https://nces.ed.gov/edfin/search/search_intro.asp. If you go to the link you can search school districts up and download the data into a csv for those schools. 
 
+Loading in that csv and making it into a table called *alabama_districts_data_2017*
 ```{r}
-html_link <- "https://nces.ed.gov/edfin/search/peergroupdata.asp?dataid=4&subdataid=1&mt=1&pagenumber=1&bleaid=&jobid=%7B7B95334C-CCBA-47C4-9871-7C82473E534A%7D" 
-html <- read_html(html_link)
+new_dataset <- "alabama.csv"
+alabama_ditricts_data_2017 <- read_csv(new_dataset)
+head(alabama_ditricts_data_2017)
+```
+Now the data needs to be cleaned up, so I will put it into a tibble and start making usable for analysis.
+```{r}
+alabama_ditricts_data_2017  <- dplyr::tibble(
+  state = alabama_ditricts_data_2017$State,
+  school_district = alabama_ditricts_data_2017$DistrictName,
+  total_revenue_per_student = alabama_ditricts_data_2017$TotalRevenuePerStudent,
+  student_teacher_ratio = alabama_ditricts_data_2017$StudentTeacherRatio,
+  administration_spending_per_student = alabama_ditricts_data_2017$AdministrationPerStudent,
+  operations_per_student = alabama_ditricts_data_2017$OperationsPerStudent)
+```
+One thing that has to be done is making the data in the *school_district* column the same format as *alabama_district_rankings_2017*. To do so I will use lapply() and paste the "SCHOOL DISTRICT" to the end of each value. Using lapply() makes the column's type a list, so I am going to also revert it back to a character. If it remained a list it will cause a error later on.
+```{r}
+alabama_ditricts_data_2017$school_district <- lapply(alabama_ditricts_data_2017$school_district, function(x) paste(x,'SCHOOL DISTRICT')) %>%
+ as.character()
+head(alabama_ditricts_data_2017$school_district)
+```
+The last thing to make this data clean and tidy is to remove the NA values. I assume these are private districts, who decline making that information public. While I could get rid of them now, we are about to merge  *alabama_ditricts_data_2017* with *alabama_district_rankings_2017* using left_join(), and any values that do not have rank will be given an NA, so if we remove those values after the join it's just a little easier.
+```{r}
+districts_with_rankings_and_model_data_2017  <- left_join(alabama_ditricts_data_2017,district_rankings_2017, by = "school_district")
+districts_with_rankings_and_model_data_2017 <- districts_with_rankings_and_model_data_2017 %>%
+  na.omit(cols = "rank")
+head(districts_with_rankings_and_model_data_2017)
+```
+Now the data is in a clean table ready for modeling. Last phase I tried to use multiple variables to prove a district's ranking, which did not work out very well. I tried to do that again this time using this new dataset, and the model was still not predictive. So I decided to change what I would be predicting. Instead of trying to prefict the rank, why not use the rank and other information to predict the total money spent per student? It is probably a better assesment as well, because spending more per student doesn't always translate to district ranking. The difference in funding could be unrelated to education.
+
+I am going to be creating a model the same way I did before, but this time it will hopefully be better. First I am going to split the data into two tables, a *train* table and a *test* table.
+Modeling
+```{r}
+set.seed(356);
+index <- createDataPartition(districts_with_rankings_and_model_data_2017$total_revenue_per_student, p = 0.75, list = FALSE)
+train <- districts_with_rankings_and_model_data_2017[index,]
+test <- districts_with_rankings_and_model_data_2017[-index,]
+```
+Now we can start running some models. The variables I am going to use are rank, student_teacher_ratio,administration_spending_per_student, and operations_per_student. Just like with the old models, we are going to keep the variables with low p-values, and remove the ones with a higher p-value.
+```{r}
+model <- lm(train, formula = total_revenue_per_student~rank + student_teacher_ratio + administration_spending_per_student + 
+              operations_per_student)
+summary(model)
+```
+ALl of the variables besides *student_teacher_ratio* are pretty significant indicators. I am going to run the model one more time, without *student_teacher_ratio* 
+```{r}
+model <- lm(train, formula = total_revenue_per_student~rank + administration_spending_per_student + 
+              operations_per_student)
+summary(model)
+```
+So now the model looks pretty good, and its time to test it.  
+
+Model Testing/Visualization
+I am going to make a function to go through the test data and calculate the estimated revenue per student(yhat)
+```{r}
+test_model <- function(model)
+{
+  modeled_rankings <- c()
+  for(i in 1:nrow(test))
+  {
+    yhat <- model$coefficients[1] + 
+      test$rank[i]*model$coefficients[2] +
+      test$administration_spending_per_student[i]*model$coefficients[3] +
+      test$operations_per_student[i]*model$coefficients[4]
+  
+    modeled_rankings <- c(modeled_rankings,yhat)
+  }
+  return(modeled_rankings)
+}
+```
+Now that we have it ready, we can now graph it and compare what the real values were to what values the model predicted.
+```{r}
+modeled_avg_rankings <- test_model(model)
+test_avg_rankings <- test$total_revenue_per_student
+modeled_avg_rankings
+test_avg_rankings
 ```
 
 ```{r}
-link <- "alabama.csv"
-l <- read_csv(link)
+plot(x=1:length(test_avg_rankings),y=test_avg_rankings,type="p",col="red", ylab = "Total Revenue per Student", xlab = "")
+  legend("topright",c("Model","Real Data"),fill = c("black","red"))
+  points(x=1:length(modeled_avg_rankings),y=modeled_avg_rankings)
+  title(main = "Alabama 2017 Modeled Revenue per Student vs Data Revenue per Student")
 ```
+The model is much better than the last one I created, because the values did not range very far, and would miss high or low values. There is one large outlier, but most other predicted values are relatively close. 
 
+I am now going to compare *total_revenue_per_student* with a few of the variables to look for any trends
 ```{r}
-colnames(l)[colnames(l) == "DistrictName"] <- "school_district"
-l$school_district = as.character(l$school_district)
+library(ggplot2)
+ggplot(data = districts_with_rankings_and_model_data_2017,aes(x=rank,y=total_revenue_per_student)) + geom_point()
 ```
+Some of the highest-ranked districts do have higher than average revenue, but for middle values of rank the revenue isn't really affected by the rank, and revenue seems to increase a slight bit in the lower-ranked districts.
 
-```{r}
-l$school_district <- lapply(l$school_district, function(x) paste(x,'SCHOOL DISTRICT'))
-head(l$school_district)
-```
 
-```{r}
-dat <- dplyr::tibble(school_district = as.character(l$school_district))
-left_join(dat,district_rankings_2017, by = "school_district") 
-```
+
+Moving Forward
+While this model does a pretty good job of predicting, it is not the newest data. It is the most recent I could find, but to make a much better model, we could operationalize some things. First it would be best to have a database, that is receiving new data and using that to create more precise models. The data would also include every school district in every state that there's data on, and large scale analytics could be done. Using the learning method K-Nearest neighbors could also be helpful, because classifying the data into groups could allow for more in-depth insights, and give some explanation how certain variables are distributed throught the data.
+
+So what does this all mean? Who cares? Well the purpose of this project was to show a correlation between how much money a school district receives and the ranking of the district, for the purpose of finding evidence that more money should be spent in schools. I would have guessed that there would have been a high correlation between those two, but there are some other inferences that can be made. Many of the school districts I looked at have similar funding per student, but vary on how successful those students are in terms of GPA, graduation rate, and highest level of education. Perhaps if I were to use those as well there could be some new insights received.
+
+When the subject of school funding is brought up, there is always debate. Some people want more taxes to go to public schools, and some people want less taxes spent on schools. It is also usually connected to someone's politcal beliefs, with more progressive people in favor of more spending, and conserative people favoring less spending. One issue that could arise is people being upset about more taxes, and while some consider taxation theft or unethical to begin with, taxation is fair as long as there is political representation.
+
+While schools have increased their graduation rates and overall success of students throughout the last few decades, it is still necesary that schools be well funded to ensure the preservation of the next generation.

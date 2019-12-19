@@ -5,15 +5,14 @@ output: html_document
 ---
 
 
-Public school's rely heavily on their budgets to give students access to the best learning experience possible. This is a dataset from the United States Census Bureau on financial data of public school districts in 2017. Upon investigating the documentation, I saw that this one dataset contains all of the different financial aspects including total revenue, total spending, and expenditure on staff and administration. The data should be fairly accurate with little to no bias, because school budgets are publically available, and the data was collected by the government.
+Public school's rely heavily on their budgets to give students access to the best learning experience possible.For this project I am going to investigate public school district finance data and determine any factors that contribute to how good a district is.
+
+This is a dataset from the United States Census Bureau on financial data of public school districts in 2017. Upon investigating the documentation, I saw that this one dataset contains all of the different financial aspects including total revenue, total spending, and expenditure on staff and administration. The data should be fairly accurate with little to no bias, because school budgets are publically available, and the data was collected by the government.
 
 ##Importing Data
 Loading in the necessary libraries and data file, then naming it finance_data:
 ```{r}
-suppressWarnings(suppressMessages(library(tidyverse)))
-suppressWarnings(suppressMessages(library(tidyr)))
-suppressWarnings(suppressMessages(library(naniar)))
-suppressWarnings(suppressMessages(library(ggplot2)))
+source("includes.R")
 finance_data <- read.csv("elsec17.csv")
 head(finance_data)
 ```
@@ -22,13 +21,14 @@ The dataset is too big to be outputted neatly, so let's see how many rows and co
 nrow(finance_data)
 ncol(finance_data)
 ```
-141 columns is quite a lo, so for now I am just going to focus on the total revenue from state taxes.
+141 columns is quite a lot, so for now I am just going to focus on the total revenue from state taxes. There is other financial data including some federal and misc. variables, but most of them are vague and not super clear what they are. Working with just state data for now will keep things simple.
 
 ##Cleaning and tidying data
 Here are all of the current column's names related to state revenue:
 ```{r}
 colnames(finance_data)[c(1:10,25:40)]
 ```
+Here is what each column represents:<br/>
 STATE: State id number<br/>
 IDCENSUS: School district id number<br/>
 NAME: School district name<br/>
@@ -89,7 +89,7 @@ colnames(finance_data)[colnames(finance_data) == "C39"] <- "state_payments_nonbe
 colnames(finance_data)[c(1:10,25:40)]
 ```
 
-Since some of this information is about the school districts and the rest is on state revenue, It makes sense to split these into two different tables, school_districts and state_revenue:
+Since some of this information is about the school districts and the rest is on state revenue, It makes sense to split these into two different tables, school_districts and state_revenue. School_districts will contain the general information on each school district, and state_revenue contains each school district's state revenue and spending.
 ```{r}
 school_districts <- dplyr::tibble(
  state = finance_data$state,                          
@@ -124,7 +124,6 @@ state_revenue <- dplyr::tibble(
  total_state_revenue = finance_data$total_state_revenue 
 )
 ```
-I decided that having a column for the same year(2017) was redundant so it will not be in the data. If I ever add more years to the data I will incorporate it back into the data.
 
 Now let's see what the two new tables look like:
 ```{r}
@@ -212,4 +211,4 @@ ggplot(subset(state_revenue, state == "Maryland"), aes(x=school_district,y=gifte
 <br/>Each school district receives different amounts for the various revenue types. While every district had some amount for school lunch or transportation, not all of them had funding for gifted and talented programs. I'm curious of there is something about the districts with no gifted programs and their average test scores compared to schools with more funding in that program.
 
 ##Conclusion
-In this report I displayed my progress while I took a data source and cleaned up the data, and did some visualization to analyze it. There a lot of things this could be used for, such as determining what states have better school funding, and how they dispere that funding. If I were to use some more data, I could tie this to something about school bullying and harrassment and try to discover a correlation between funding in school and bulling.
+In this report I displayed my progress while I took a data source and cleaned up the data, and did some visualization to analyze it. There a lot of things this could be used for, such as determining what states have better school funding, and how they dispere that funding. If I were to get some more data, I could start to discover how the money a district receives affects its performance.
