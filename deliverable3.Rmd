@@ -87,15 +87,14 @@ test_model <- function(model)
   return(modeled_rankings)
 }
 ```
-Now that we have it ready, we can now graph it and compare what the real values were to what values the model predicted.
+Now that we have it ready, we can now graph it and compare what the real values were to what values the model predicted. I am going to call the function, and use that along with test$total_revenue_per_student to create a graph. For the graph, the larger vertical gap there is between the red and black dots, the less accurate the model is.
 ```{r}
 modeled_avg_rankings <- test_model(model)
 test_avg_rankings <- test$total_revenue_per_student
 modeled_avg_rankings
 test_avg_rankings
-```
 
-```{r}
+
 plot(x=1:length(test_avg_rankings),y=test_avg_rankings,type="p",col="red", ylab = "Total Revenue per Student", xlab = "")
   legend("topright",c("Model","Real Data"),fill = c("black","red"))
   points(x=1:length(modeled_avg_rankings),y=modeled_avg_rankings)
