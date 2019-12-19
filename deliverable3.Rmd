@@ -1,0 +1,39 @@
+---
+title: "R Notebook"
+author: "Brenndan Olson"
+output: html_notebook
+---
+
+```{r}
+suppressWarnings(library(knitr))
+```
+
+```{r}
+purl("deliverable2.Rmd", output = "part2.r")
+source("part2.r")
+```
+
+```{r}
+html_link <- "https://nces.ed.gov/edfin/search/peergroupdata.asp?dataid=4&subdataid=1&mt=1&pagenumber=1&bleaid=&jobid=%7B7B95334C-CCBA-47C4-9871-7C82473E534A%7D" 
+html <- read_html(html_link)
+```
+
+```{r}
+link <- "alabama.csv"
+l <- read_csv(link)
+```
+
+```{r}
+colnames(l)[colnames(l) == "DistrictName"] <- "school_district"
+l$school_district = as.character(l$school_district)
+```
+
+```{r}
+l$school_district <- lapply(l$school_district, function(x) paste(x,'SCHOOL DISTRICT'))
+head(l$school_district)
+```
+
+```{r}
+dat <- dplyr::tibble(school_district = as.character(l$school_district))
+left_join(dat,district_rankings_2017, by = "school_district") 
+```
